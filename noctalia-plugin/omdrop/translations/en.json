@@ -1,0 +1,25 @@
+{
+  "settings.omdrop_bin.label": "omdrop command",
+  "settings.omdrop_bin.description": "Which omdrop to drive. A bare name is looked up on PATH, then at the Home Manager link in ~/.local/bin.",
+
+  "settings.active_interval.label": "Polling while receiving",
+  "settings.active_interval.description": "Seconds between status checks while an AirDrop window is open, or just after you press a button.",
+
+  "settings.idle_interval.label": "Polling while idle",
+  "settings.idle_interval.description": "Seconds between status checks when nothing is receiving. Lower values react faster but spawn more processes.",
+
+  "settings.action_grace_ms.label": "Fast-poll window",
+  "settings.action_grace_ms.description": "Milliseconds to keep polling quickly after a panel action, so the bar reflects the change at once.",
+
+  "settings.show_remaining.label": "Show time left",
+  "settings.show_remaining.description": "Put the remaining window time next to the bar glyph.",
+
+  "settings.duration.label": "Default window",
+  "settings.duration.1m": "1 minute",
+  "settings.duration.3m": "3 minutes",
+  "settings.duration.5m": "5 minutes",
+  "settings.duration.10m": "10 minutes",
+  "settings.duration.30m": "30 minutes",
+  "settings.duration.once": "Until the transfer is done",
+  "settings.duration.forever": "No limit"
+}

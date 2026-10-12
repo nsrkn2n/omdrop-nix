@@ -110,6 +110,21 @@ with lib;
         default = null;
         description = "Refuse an upload once free disk space drops below this percentage.";
       };
+
+      noctaliaPlugin = mkOption {
+        type = types.bool;
+        default = true;
+        description = ''
+          Install the bundled Noctalia bar widget and panel into
+          ~/.local/share/noctalia/plugins/omdrop. The widget draws AirDrop state
+          and the panel turns the receive window on and off.
+
+          This only installs the files. Noctalia has to be told to load it:
+          add "me/omdrop" to `services.noctalia.settings.plugins.enabled`,
+          "omdrop" to `services.noctalia.settings.bar.default.start`, and
+          declare `[widget.omdrop] type = "me/omdrop:omdrop"`.
+        '';
+      };
     };
 
     config = mkIf cfg.enable {
@@ -131,5 +146,11 @@ with lib;
       xdg.configFile."airdrop/config.toml" = mkIf (settings != {}) {
         text = configText + "\n";
       };
+
+      # Read-only: the widget and panel only ever run `omdrop status`,
+      # `peers` and `doctor`, all of which are unprivileged. Anything that
+      # touches the radio (`on`, `off`, `visibility`) is a button press, which
+      # raises a polkit prompt like it does from a terminal.
+      xdg.dataFile."noctalia/plugins/omdrop".source = mkIf cfg.noctaliaPlugin ../../noctalia-plugin/omdrop;
     };
   }

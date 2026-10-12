@@ -1,0 +1,88 @@
+id = "me/omdrop"
+name = "AirDrop"
+version = "1.0.0"
+# 24 = noctalia.runAsync's argument-array form. Everything else used here
+# (render, function callbacks, state, togglePanel, nowMs) arrived earlier.
+plugin_api = 24
+author = "youn"
+license = "MIT"
+description = "AirDrop to and from nearby Apple devices, from the bar."
+tags = ["airdrop", "apple", "files", "omdrop"]
+dependencies = ["omdrop"]
+
+# Which omdrop to drive. A bare name is looked up on PATH, then at the Home
+# Manager profile, so this resolves either way.
+[[setting]]
+key = "omdrop_bin"
+type = "string"
+label_key = "settings.omdrop_bin.label"
+description_key = "settings.omdrop_bin.description"
+default = "omdrop"
+
+[[setting]]
+key = "active_interval"
+type = "int"
+label_key = "settings.active_interval.label"
+description_key = "settings.active_interval.description"
+default = 3
+min = 1
+max = 60
+
+[[setting]]
+key = "idle_interval"
+type = "int"
+label_key = "settings.idle_interval.label"
+description_key = "settings.idle_interval.description"
+default = 15
+min = 5
+max = 300
+
+# Poll hard for this long after any action, so the panel reflects a turn-on
+# straight away instead of waiting out the idle interval.
+[[setting]]
+key = "action_grace_ms"
+type = "int"
+label_key = "settings.action_grace_ms.label"
+default = 20000
+min = 0
+max = 120000
+
+# Show the time left in the window beside the bar glyph.
+[[setting]]
+key = "show_remaining"
+type = "bool"
+label_key = "settings.show_remaining.label"
+default = true
+
+# Default window length offered by the panel's toggle.
+[[setting]]
+key = "duration"
+type = "select"
+label_key = "settings.duration.label"
+default = "10m"
+options = [
+  { value = "1m", label_key = "settings.duration.1m" },
+  { value = "3m", label_key = "settings.duration.3m" },
+  { value = "5m", label_key = "settings.duration.5m" },
+  { value = "10m", label_key = "settings.duration.10m" },
+  { value = "30m", label_key = "settings.duration.30m" },
+  { value = "once", label_key = "settings.duration.once" },
+  { value = "forever", label_key = "settings.duration.forever" },
+]
+
+[[service]]
+id = "poller"
+entry = "service.luau"
+
+[[widget]]
+id = "omdrop"
+entry = "widget.luau"
+
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 380
+height = "fill"
+placement = "floating"
+position = "center"
+open_near_click = true

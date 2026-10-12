@@ -92,6 +92,7 @@ enabled. Nothing is on by default, and it is a good idea to read
   `~/.config/airdrop/config.toml`, which `airdrop-serve.py` validates on every
   start. A value the receiver rejects is a value it refuses to start with, so
   a bad `downloadDir` (missing, or owned by someone else) fails loudly.
+- `noctaliaPlugin` — install the Noctalia bar widget (see below).
 
 ## Building and checking
 
@@ -110,10 +111,43 @@ fails here rather than on someone's machine.
 Works here: X250 (Intel AX210), 0.16.1 of the plugin against a 0.1.0 backend,
 probe reports `{"backend":"owl","contract":"0.8.1","hardware":true,"missing":[]}`.
 
-Not packaged: the Quickshell bar widget integration (the QML is installed, but
-wiring it to Noctalia's bar is a separate job) and the plugin's
-`install-driver` path, which builds a *different* backend (omdrop-awdl, for
-Broadcom cards) and refuses to touch an installed package.
+Not packaged: the plugin's `install-driver` path, which builds a *different*
+backend (omdrop-awdl, for Broadcom cards) and refuses to touch an installed
+package.
+
+## Noctalia widget
+
+The plugin ships a [Noctalia](https://docs.noctalia.dev) plugin (Luau) that
+puts an AirDrop glyph in your bar and a panel behind it. Installing it is part
+of the Home Manager module (`noctaliaPlugin`, on by default); telling Noctalia
+to load it is not, because that is your shell's config:
+
+```nix
+services.noctalia.settings = {
+  plugins.enabled = [ "me/omdrop" ];
+  bar.default.start = [ "cpu" "ram" "omdrop" ];
+
+  # Declaring the widget is what gives `bar.default.start` something to
+  # resolve; the name in `start` matches the key here.
+  widget.omdrop.type = "me/omdrop:omdrop";
+};
+```
+
+The glyph is white when idle, accent-coloured while a window is open, amber if
+omdrop asked to be visible and the radio declined, and red if omdrop itself is
+unwell. The panel has the on/off button, the window length, who-may-send, the
+nearby peers, and whatever `omdrop doctor` says is still missing.
+
+Polling is deliberately split: the service only ever runs `omdrop status`,
+`peers` and `doctor`, all of which are unprivileged, so a status poll can
+never raise a password prompt. Everything that touches the radio — `on`,
+`off`, `visibility` — is behind a button and asks for authorisation like it
+does from a terminal. Exclusive mode takes Wi-Fi down for the length of the
+window, which is the price of being an AirDrop radio on an Intel card.
+
+Widget settings (`noctalia` → plugin settings): `omdrop_bin`,
+`active_interval`, `idle_interval`, `action_grace_ms`, `show_remaining`,
+`duration`.
 
 ## Licences
 
@@ -121,4 +155,5 @@ Broadcom cards) and refuses to touch an installed package.
   `omdrop-owl` (GPL-3.0-or-later) and `omdrop-awdl` (GPL-2.0-only); the
   radiotap library is ISC.
 - `pkgs/omdrop-plugin.nix` installs `omdrop-plugin` (MIT).
+- `noctalia-plugin/omdrop` is ours (MIT).
 - This flake's own expressions are MIT.

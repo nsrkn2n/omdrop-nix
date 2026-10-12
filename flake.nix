@@ -94,17 +94,24 @@
             unit = hm.config.home.file.".config/systemd/user/airdrop-receiver.service".source;
             command = hm.config.home.file.".local/bin/omdrop".source;
             config = pkgs.writeText "airdrop-config-check.toml" hm.config.xdg.configFile."airdrop/config.toml".text;
+            plugin = hm.config.xdg.dataFile."noctalia/plugins/omdrop".source;
           }
           ''
             test -f "$unit"
             test -f "$command"
             grep -q 'name = "omdrop-check"' "$config"
             grep -q 'download_dir = "/home/omdrop-check/AirDrop"' "$config"
+            test -f "$plugin/plugin.toml"
+            test -f "$plugin/service.luau"
+            test -f "$plugin/widget.luau"
+            test -f "$plugin/panel.luau"
+            test -f "$plugin/translations/en.json"
             mkdir "$out"
           '';
       }
     );
 
-    formatter = forAllSystems (pkgs: _system: pkgs.nixfmt-rfc-style);
+    # alejandra, to match the configuration this is written to be consumed by.
+    formatter = forAllSystems (pkgs: _system: pkgs.alejandra);
   };
 }
